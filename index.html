@@ -6,8 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Studio Gestor - Gestión de Proyectos</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/jpeg"
+        href="https://instagram.fvlc7-1.fna.fbcdn.net/v/t51.82787-19/660050712_18046359314729513_4363502372584103998_n.jpg?efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4xMDgwLmMyIn0&_nc_ht=instagram.fvlc7-1.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2gFOvL12IvJ4mQKPXviFtRdCDIv0oEu0FQnzbISHALgSI-kF9pgFUkqSd3l4iE6c-g8&_nc_ohc=lr9JUm5Ba-sQ7kNvwFwc6a1&_nc_gid=RxGTEPKOBZwfr8LXP54kfA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_Af0tXGfbqegT-coOehk3QqwxzHNcTCkZGG55lWw6WD5bNg&oe=69E47CD0&_nc_sid=7a9f4b">
     <link rel="apple-touch-icon"
-        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23d46a4a' width='180' height='180'/><text x='90' y='90' font-size='90' fill='white' text-anchor='middle' dominant-baseline='central' font-weight='bold'>SG</text></svg>">
+        href="https://instagram.fvlc7-1.fna.fbcdn.net/v/t51.82787-19/660050712_18046359314729513_4363502372584103998_n.jpg?efg=eyJ2ZW5jb2RlX3RhZyI6InByb2ZpbGVfcGljLmRqYW5nby4xMDgwLmMyIn0&_nc_ht=instagram.fvlc7-1.fna.fbcdn.net&_nc_cat=105&_nc_oc=Q6cZ2gFOvL12IvJ4mQKPXviFtRdCDIv0oEu0FQnzbISHALgSI-kF9pgFUkqSd3l4iE6c-g8&_nc_ohc=lr9JUm5Ba-sQ7kNvwFwc6a1&_nc_gid=RxGTEPKOBZwfr8LXP54kfA&edm=AP4sbd4BAAAA&ccb=7-5&oh=00_Af0tXGfbqegT-coOehk3QqwxzHNcTCkZGG55lWw6WD5bNg&oe=69E47CD0&_nc_sid=7a9f4b">
     <meta name="theme-color" content="#d46a4a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -80,6 +82,7 @@
         }
 
         .container {
+            width: 100%;
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
@@ -768,6 +771,13 @@
             gap: 1rem;
         }
 
+        /* Evitar desbordamiento horizontal global */
+        html,
+        body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
         @media (max-width: 1024px) {
             .stats {
                 grid-template-columns: 1fr;
@@ -780,28 +790,92 @@
 
         @media (max-width: 768px) {
             .container {
+                padding: 0.75rem;
+            }
+
+            /* Header compacto en móvil */
+            header {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding-bottom: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            /* Ocultar botones secundarios, dejar solo Nuevo proyecto */
+            .header-actions {
+                width: 100%;
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .header-actions button:not(.primary) {
+                display: none;
+            }
+
+            .header-actions button.primary {
+                width: 100%;
+            }
+
+            /* Tabs más compactos */
+            .tab-button {
+                padding: 0.75rem 1rem;
+                font-size: 13px;
+            }
+
+            /* Dashboard: exactamente 2 columnas que caben en pantalla */
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .metric-card {
                 padding: 1rem;
             }
 
-            header {
-                flex-direction: column;
+            .metric-value {
+                font-size: 22px;
+            }
+
+            .metric-label {
+                font-size: 10px;
+            }
+
+            /* Projects: 1 columna en móvil */
+            .projects-grid {
+                grid-template-columns: 1fr;
                 gap: 1rem;
-                text-align: center;
             }
 
-            .header-actions {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .header-actions button {
-                width: 100%;
-            }
-
+            /* Filtros apilados */
             .filters {
                 flex-direction: column;
+                gap: 0.5rem;
             }
 
+            .filters-left {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .filters-left input,
+            .filters-left select {
+                width: 100%;
+            }
+
+            .view-toggle-group {
+                width: 100%;
+            }
+
+            .view-toggle-group button {
+                flex: 1;
+            }
+
+            /* Inputs full width */
             input[type="text"],
             input[type="date"],
             input[type="number"],
@@ -813,16 +887,10 @@
                 grid-template-columns: 1fr;
             }
 
-            .view-toggle-group {
-                width: 100%;
-            }
-
-            .view-toggle-group button {
-                flex: 1;
-            }
-
+            /* Tareas */
             .task-item {
                 flex-wrap: wrap;
+                padding: 1rem;
             }
 
             .task-item input[type="date"],
@@ -838,6 +906,25 @@
 
             .add-task input {
                 min-width: unset;
+            }
+
+            /* Tabla: scroll horizontal */
+            .projects-table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Modal full-screen en móvil */
+            .modal-content {
+                width: 95%;
+                padding: 1.25rem;
+                max-height: 95vh;
+            }
+
+            /* Stats 1 columna */
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
         }
     </style>
@@ -885,10 +972,6 @@
             <header>
                 <h1>Studio Gestor</h1>
                 <div class="header-actions">
-                    <button onclick="exportToExcel()">Descargar Excel</button>
-                    <button onclick="document.getElementById('importFile').click()">Importar Excel</button>
-                    <input type="file" id="importFile" style="display: none;" accept=".xlsx,.xls"
-                        onchange="importFromExcel(event)">
                     <button class="primary" onclick="openModal('projectModal')">+ Nuevo proyecto</button>
                 </div>
             </header>
@@ -933,14 +1016,14 @@
                         </select>
                     </div>
                     <div class="view-toggle-group">
-                        <button class="view-toggle active" onclick="switchView('grid')">Tarjetas</button>
-                        <button class="view-toggle" onclick="switchView('table')">Lista</button>
+                        <button class="view-toggle" onclick="switchView('grid')">Tarjetas</button>
+                        <button class="view-toggle active" onclick="switchView('table')">Lista</button>
                     </div>
                 </div>
 
-                <div class="projects-grid" id="projectsGrid"></div>
+                <div class="projects-grid hidden" id="projectsGrid"></div>
 
-                <div class="projects-table-wrapper" id="projectsTableWrapper">
+                <div class="projects-table-wrapper active" id="projectsTableWrapper">
                     <table class="projects-table">
                         <thead>
                             <tr>
@@ -1164,7 +1247,7 @@
         let statusChart = null;
         let profitChart = null;
         let editingId = null;
-        let currentView = 'grid';
+        let currentView = 'table';
         let taskFilter = 'pending';
 
         let projectTypes = ['lámina', 'mural', 'portada', 'ilustración', 'otro'];

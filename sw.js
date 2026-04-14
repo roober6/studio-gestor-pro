@@ -1,5 +1,5 @@
 // Service Worker para Studio Gestor Pro
-const CACHE_NAME = 'gestor-pro-v1';
+const CACHE_NAME = 'gestor-pro-v2';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
@@ -51,7 +51,7 @@ self.addEventListener('fetch', event => {
         if (response) {
           return response;
         }
-        
+
         return fetch(event.request).then(response => {
           // Check if valid response
           if (!response || response.status !== 200 || response.type === 'error') {
