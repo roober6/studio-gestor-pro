@@ -1117,11 +1117,11 @@
             <!-- TAB: CONFIGURACIÓN -->
             <div id="configuracion" class="tab-content">
                 <div class="import-section">
-                    <p style="margin-bottom: 1rem;">Importa un archivo Excel previamente descargado para restaurar tus
-                        datos
-                        en otro dispositivo.</p>
-                    <button class="primary" onclick="document.getElementById('importFile2').click()"
-                        style="width: 100%;">Seleccionar archivo Excel</button>
+                    <p style="margin-bottom: 1rem;">Exporta todos tus datos a Excel o importa un archivo previamente descargado para restaurar en otro dispositivo.</p>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="primary" onclick="exportToExcel()" style="flex: 1;">Exportar a Excel</button>
+                        <button onclick="document.getElementById('importFile2').click()" style="flex: 1;">Importar desde Excel</button>
+                    </div>
                     <input type="file" id="importFile2" style="display: none;" accept=".xlsx,.xls"
                         onchange="importFromExcel(event)">
                 </div>
@@ -1389,7 +1389,7 @@
             const text = input.value.trim();
             if (text) {
                 tasks.push({ id: Date.now(), text, completed: false, date: '', expense: 0, project: '', createdAt: new Date().toISOString() });
-                localStorage.setItem('designTasks', JSON.stringify(tasks));
+                saveTasks();
                 input.value = '';
                 renderTasks();
                 updateTaskSummary();
@@ -1400,7 +1400,7 @@
             const task = tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
-                localStorage.setItem('designTasks', JSON.stringify(tasks));
+                saveTasks();
                 renderTasks();
                 updateTaskSummary();
             }
@@ -1412,14 +1412,14 @@
                 if (field === 'date') task.date = value;
                 if (field === 'expense') task.expense = parseFloat(value) || 0;
                 if (field === 'project') task.project = value;
-                localStorage.setItem('designTasks', JSON.stringify(tasks));
+                saveTasks();
                 updateTaskSummary();
             }
         }
 
         function deleteTask(id) {
             tasks = tasks.filter(t => t.id !== id);
-            localStorage.setItem('designTasks', JSON.stringify(tasks));
+            saveTasks();
             renderTasks();
             updateTaskSummary();
         }
@@ -1459,18 +1459,13 @@
             if (taskFilter === 'pending') filtered = tasks.filter(t => !t.completed);
             if (taskFilter === 'completed') filtered = tasks.filter(t => t.completed);
 
-            // Ordenar por fecha (si hay fecha)
-            filtered = filtered.sort((a, b) => {
-                if (!a.date && !b.date) return 0;
-                if (!a.date) return 1;
-                if (!b.date) return -1;
-                return new Date(a.date) - new Date(b.date);
-            });
+            // Ordenar por fecha de creación descendente (más recientes primero)
+            filtered = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
             tasksList.innerHTML = filtered.length === 0 ? '<p style="text-align: center; color: var(--text-tertiary); padding: 2rem;">Sin tareas</p>' : filtered.map(t => `
                 <div class="task-item ${t.completed ? 'completed' : ''}">
-                    <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleTask(${t.id})">
-                    <label>${t.text}</label>
+                    <input type="checkbox" id="task-${t.id}" ${t.completed ? 'checked' : ''} onchange="toggleTask(${t.id})">
+                    <label for="task-${t.id}" title="Marcar como completada">${t.text}</label>
                     <input type="date" value="${t.date || ''}" onchange="updateTask(${t.id}, 'date', this.value)">
                     <input type="number" placeholder="Gasto €" step="0.01" value="${t.expense || ''}" onchange="updateTask(${t.id}, 'expense', this.value)">
                     <select onchange="updateTask(${t.id}, 'project', this.value)">
@@ -2099,7 +2094,7 @@
                     }
 
                     saveProjects();
-                    localStorage.setItem('designTasks', JSON.stringify(tasks));
+                    saveTasks();
 
                     alert('Datos importados correctamente');
                     loadProjects();
