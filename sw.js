@@ -1,5 +1,5 @@
 // Service Worker para Studio Gestor Pro
-const CACHE_NAME = 'gestor-pro-v2';
+const CACHE_NAME = 'gestor-pro-v3';
 const URLS_TO_CACHE = [
   '/',
   '/index.html',
