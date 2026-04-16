@@ -214,9 +214,10 @@
         .filters-left {
             display: flex;
             gap: 1rem;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: center;
             flex: 1;
+            min-width: 0;
         }
 
         input[type="text"],
@@ -1011,11 +1012,11 @@
                 <div class="filters">
                     <div class="filters-left">
                         <input type="text" id="searchInput" placeholder="Buscar por título o cliente..."
-                            onkeyup="filterProjects()">
-                        <select id="typeFilter" onchange="filterProjects()">
+                            onkeyup="filterProjects()" style="flex: 2; min-width: 0;">
+                        <select id="typeFilter" onchange="filterProjects()" style="flex: 1; min-width: 0;">
                             <option value="">Todas las tipologías</option>
                         </select>
-                        <select id="statusFilter" onchange="filterProjects()">
+                        <select id="statusFilter" onchange="filterProjects()" style="flex: 1; min-width: 0;">
                             <option value="">Todos los estados</option>
                         </select>
                     </div>
