@@ -928,6 +928,193 @@
                 gap: 1rem;
             }
         }
+        /* ===== LIQUID GLASS THEME ===== */
+        #themeToggle {
+            font-size: 12px;
+            padding: 0.5rem 1rem;
+            letter-spacing: 0.3px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        #themeToggle.active {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 12px rgba(100, 100, 200, 0.15), inset 0 1px 0 rgba(255,255,255,0.9);
+            color: var(--text-primary);
+        }
+
+        body.glass-theme {
+            background: linear-gradient(135deg, #dfe9f3 0%, #f5eaf0 35%, #eaf5ee 65%, #ede7f6 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        body.glass-theme .container {
+            --glass-bg: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.75);
+            --glass-shadow: 0 8px 32px rgba(80, 80, 160, 0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+            --glass-blur: blur(24px) saturate(180%);
+        }
+
+        body.glass-theme .metric-card,
+        body.glass-theme .project-card,
+        body.glass-theme .stat-box,
+        body.glass-theme .tasks-section,
+        body.glass-theme .import-section,
+        body.glass-theme .settings-section,
+        body.glass-theme .projects-table-wrapper {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        body.glass-theme .modal-content {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 24px 64px rgba(80, 80, 160, 0.14);
+        }
+
+        body.glass-theme header {
+            background: rgba(247, 246, 243, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        body.glass-theme .tabs {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+        }
+
+        body.glass-theme input[type="text"],
+        body.glass-theme input[type="date"],
+        body.glass-theme input[type="number"],
+        body.glass-theme input[type="email"],
+        body.glass-theme input[type="password"],
+        body.glass-theme input[type="tel"],
+        body.glass-theme textarea,
+        body.glass-theme select {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(200, 200, 220, 0.5);
+        }
+
+        body.glass-theme button:not(.primary):not(.tab-button):not(.close-btn):not(.task-filters button) {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        body.glass-theme button:not(.primary):not(.tab-button):not(.close-btn):not(.task-filters button):hover {
+            background: rgba(255, 255, 255, 0.68);
+        }
+
+        body.glass-theme .task-item {
+            background: rgba(255, 255, 255, 0.38);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            border-radius: 10px;
+        }
+
+        body.glass-theme .settings-item {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        body.glass-theme .task-summary {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        body.glass-theme .projects-table thead {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        body.glass-theme .projects-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        body.glass-theme .project-card:hover {
+            box-shadow: 0 12px 40px rgba(80, 80, 160, 0.14), inset 0 1px 0 rgba(255,255,255,0.9);
+            transform: translateY(-3px);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body.glass-theme {
+                background: linear-gradient(135deg, #1a1f35 0%, #2a1f2e 40%, #1a2a28 70%, #1f1a2e 100%);
+                background-attachment: fixed;
+            }
+
+            body.glass-theme .container {
+                --glass-bg: rgba(40, 40, 60, 0.55);
+                --glass-border: rgba(255, 255, 255, 0.12);
+                --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.07);
+            }
+
+            body.glass-theme input[type="text"],
+            body.glass-theme input[type="date"],
+            body.glass-theme input[type="number"],
+            body.glass-theme input[type="email"],
+            body.glass-theme input[type="password"],
+            body.glass-theme input[type="tel"],
+            body.glass-theme textarea,
+            body.glass-theme select {
+                background: rgba(255, 255, 255, 0.07);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+            }
+
+            body.glass-theme button:not(.primary):not(.tab-button):not(.close-btn):not(.task-filters button) {
+                background: rgba(255, 255, 255, 0.08);
+                border: 1px solid rgba(255, 255, 255, 0.13);
+            }
+
+            body.glass-theme button:not(.primary):not(.tab-button):not(.close-btn):not(.task-filters button):hover {
+                background: rgba(255, 255, 255, 0.14);
+            }
+
+            body.glass-theme .task-item {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            body.glass-theme .settings-item {
+                background: rgba(255, 255, 255, 0.06);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            body.glass-theme .task-summary {
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            body.glass-theme #themeToggle.active {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+            }
+
+            body.glass-theme .modal-content {
+                background: rgba(30, 30, 50, 0.75);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+            }
+
+            body.glass-theme header {
+                background: rgba(26, 26, 40, 0.5);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            }
+        }
     </style>
 
     <!-- Vercel Web Analytics -->
@@ -977,6 +1164,7 @@
             <header>
                 <h1>Studio Gestor</h1>
                 <div class="header-actions">
+                    <button id="themeToggle" onclick="toggleTheme()">◈ Glass</button>
                     <button class="primary" onclick="openModal('projectModal')">+ Nuevo proyecto</button>
                 </div>
             </header>
@@ -2141,6 +2329,21 @@
         }
 
         loadProjects();
+
+        // ===== THEME TOGGLE =====
+        function toggleTheme() {
+            const isGlass = document.body.classList.toggle('glass-theme');
+            document.getElementById('themeToggle').classList.toggle('active', isGlass);
+            localStorage.setItem('theme', isGlass ? 'glass' : 'default');
+        }
+
+        // Aplicar tema guardado al cargar
+        (function () {
+            if (localStorage.getItem('theme') === 'glass') {
+                document.body.classList.add('glass-theme');
+                document.getElementById('themeToggle').classList.add('active');
+            }
+        })();
     </script>
 
     <script>
