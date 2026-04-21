@@ -17,6 +17,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -34,6 +35,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        const storage = firebase.storage();
 
         console.log('✅ Firebase inicializado correctamente');
     </script>
@@ -1426,6 +1428,11 @@
                     <label>Foto del proyecto (URL)</label>
                     <input type="text" id="projectImage" placeholder="https://...">
                 </div>
+                <div class="form-group">
+                    <label>Archivo Final (PDF, Word, ZIP... Máx 15MB)</label>
+                    <input type="file" id="projectFile" accept="*/*">
+                    <small id="projectFileProgress" style="display:none; color: var(--accent); margin-top: 0.5rem; display: block;"></small>
+                </div>
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                     <button type="submit" class="primary" style="flex: 1;">Guardar proyecto</button>
                     <button type="button" onclick="closeModal('projectModal')" style="flex: 1;">Cancelar</button>
@@ -1870,8 +1877,61 @@
         }
 
 
-        function saveProject(e) {
+        async function saveProject(e) {
             e.preventDefault();
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+
+            let fileUrl = null;
+            let fileName = null;
+            const fileInput = document.getElementById('projectFile');
+            const progressRef = document.getElementById('projectFileProgress');
+
+            if (editingId) {
+                const existingProject = projects.find(p => p.id === editingId);
+                if (existingProject && existingProject.fileUrl) {
+                    fileUrl = existingProject.fileUrl;
+                    fileName = existingProject.fileName;
+                }
+            }
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                if (file.size > 15 * 1024 * 1024) {
+                    alert("El archivo excede el tamaño máximo permitido de 15MB.");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                    return;
+                }
+
+                if (!currentUserId) {
+                    alert("Debes iniciar sesión para subir archivos.");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                    return;
+                }
+
+                try {
+                    progressRef.style.display = 'block';
+                    progressRef.textContent = 'Subiendo archivo...';
+                    
+                    const storageRef = storage.ref(`proyectos_archivos/${currentUserId}/${Date.now()}_${file.name}`);
+                    const snapshot = await storageRef.put(file);
+                    fileUrl = await snapshot.ref.getDownloadURL();
+                    fileName = file.name;
+                } catch (error) {
+                    console.error("Error subiendo archivo: ", error);
+                    alert("Hubo un error al subir el archivo: " + error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                    progressRef.style.display = 'none';
+                    return;
+                }
+            }
+
             const project = {
                 id: editingId || Date.now(),
                 title: document.getElementById('projectTitle').value,
@@ -1884,6 +1944,8 @@
                 price: parseFloat(document.getElementById('projectPrice').value) || 0,
                 paid: parseFloat(document.getElementById('projectPaid').value) || 0,
                 image: document.getElementById('projectImage').value,
+                fileUrl: fileUrl,
+                fileName: fileName,
                 createdAt: editingId ? projects.find(p => p.id === editingId).createdAt : new Date().toISOString()
             };
 
@@ -1894,13 +1956,17 @@
                 projects.push(project);
             }
 
-            saveProjects();
+            await saveProjects();
             closeModal('projectModal');
             resetForm();
             renderProjects();
             renderTasks();
             updateDashboard();
             updateCharts();
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+            progressRef.style.display = 'none';
         }
 
         // ========================================
@@ -2007,6 +2073,7 @@
                                 <strong style="color: ${(p.paid || 0) >= (p.price || 0) ? 'var(--success)' : 'var(--warning)'};">€${(p.paid || 0).toFixed(2)}</strong>
                             </div>
                         </div >
+            ${p.fileUrl ? `<div style="margin-top: 1rem;"><a href="${p.fileUrl}" target="_blank" style="text-decoration:none;"><button style="width:100%; background:var(--bg-secondary); border:1px dashed var(--border);">📎 Ver Archivo: ${p.fileName || 'Descargar'}</button></a></div>` : ''}
             <div class="project-footer">
                 <button onclick="editProject(${p.id})">Editar</button>
                 <button onclick="deleteProject(${p.id})" style="color: #d46a4a;">Eliminar</button>
@@ -2030,6 +2097,7 @@
                     <td><span class="status-badge status-${p.status}">${p.status || '-'}</span></td>
                     <td>
                         <div class="table-actions">
+                            ${p.fileUrl ? `<a href="${p.fileUrl}" target="_blank" title="Ver Archivo"><button style="background:var(--bg-tertiary);">📎</button></a>` : ''}
                             <button onclick="editProject(${p.id})">Editar</button>
                             <button onclick="deleteProject(${p.id})" style="color: #d46a4a;">Borrar</button>
                         </div>
@@ -2072,6 +2140,15 @@
             document.getElementById('projectPrice').value = project.price;
             document.getElementById('projectPaid').value = project.paid;
             document.getElementById('projectImage').value = project.image;
+            document.getElementById('projectFile').value = '';
+            
+            const progressRef = document.getElementById('projectFileProgress');
+            if (project.fileUrl) {
+                progressRef.style.display = 'block';
+                progressRef.textContent = `Archivo actual adjunto: ${project.fileName || 'Descargar'}`;
+            } else {
+                progressRef.style.display = 'none';
+            }
 
             document.querySelector('.modal-header h2').textContent = 'Editar proyecto';
             openModal('projectModal');
@@ -2319,6 +2396,9 @@
             document.getElementById('projectPrice').value = '';
             document.getElementById('projectPaid').value = '';
             document.getElementById('projectImage').value = '';
+            document.getElementById('projectFile').value = '';
+            document.getElementById('projectFileProgress').style.display = 'none';
+            document.getElementById('projectFileProgress').textContent = '';
             document.querySelector('.modal-header h2').textContent = 'Nuevo proyecto';
             editingId = null;
         }
