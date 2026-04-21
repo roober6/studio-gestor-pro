@@ -1424,6 +1424,37 @@
                         <input type="number" id="projectPaid" step="0.01" min="0">
                     </div>
                 </div>
+                <div style="margin-top: 1rem; margin-bottom: 1rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px;">
+                    <h4 style="margin-bottom: 1rem; font-size: 13px; text-transform: uppercase;">Detalles de Impresión</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Tamaño Papel</label>
+                            <input type="text" id="projectPaperSize" placeholder="Ej: A4, A3, 32x45..." list="paperSizes">
+                            <datalist id="paperSizes">
+                                <option value="A4">
+                                <option value="A3">
+                                <option value="SRA3 (32x45)">
+                                <option value="A2">
+                                <option value="A1">
+                            </datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo Papel</label>
+                            <input type="text" id="projectPaperType" placeholder="Ej: Estucado Mate 300g..." list="paperTypes">
+                            <datalist id="paperTypes">
+                                <option value="Estucado Mate 300g">
+                                <option value="Estucado Brillo 150g">
+                                <option value="Papel Offset 80g">
+                                <option value="Papel Fotográfico Brillo">
+                                <option value="Cartulina Gráfica">
+                            </datalist>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Nº de Copias</label>
+                        <input type="number" id="projectCopies" min="1" value="1">
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>Foto del proyecto (URL)</label>
                     <input type="text" id="projectImage" placeholder="https://...">
@@ -1943,6 +1974,9 @@
                 deliveryDate: document.getElementById('projectDeliveryDate').value,
                 price: parseFloat(document.getElementById('projectPrice').value) || 0,
                 paid: parseFloat(document.getElementById('projectPaid').value) || 0,
+                paperSize: document.getElementById('projectPaperSize').value,
+                paperType: document.getElementById('projectPaperType').value,
+                copies: parseInt(document.getElementById('projectCopies').value) || 1,
                 image: document.getElementById('projectImage').value,
                 fileUrl: fileUrl,
                 fileName: fileName,
@@ -2074,8 +2108,9 @@
                             </div>
                         </div >
             ${p.fileUrl ? `<div style="margin-top: 1rem;"><a href="${p.fileUrl}" target="_blank" style="text-decoration:none;"><button style="width:100%; background:var(--bg-secondary); border:1px dashed var(--border);">📎 Ver Archivo: ${p.fileName || 'Descargar'}</button></a></div>` : ''}
-            <div class="project-footer">
+            <div class="project-footer" style="flex-wrap: wrap;">
                 <button onclick="editProject(${p.id})">Editar</button>
+                <button onclick="sendToImprenta(${p.id})" style="color: var(--info);">🖨️ Enviar</button>
                 <button onclick="deleteProject(${p.id})" style="color: #d46a4a;">Eliminar</button>
             </div>
                     </div >
@@ -2098,6 +2133,7 @@
                     <td>
                         <div class="table-actions">
                             ${p.fileUrl ? `<a href="${p.fileUrl}" target="_blank" title="Ver Archivo"><button style="background:var(--bg-tertiary);">📎</button></a>` : ''}
+                            <button onclick="sendToImprenta(${p.id})" title="Enviar a Línea 2">🖨️</button>
                             <button onclick="editProject(${p.id})">Editar</button>
                             <button onclick="deleteProject(${p.id})" style="color: #d46a4a;">Borrar</button>
                         </div>
@@ -2139,6 +2175,9 @@
             document.getElementById('projectDeliveryDate').value = project.deliveryDate;
             document.getElementById('projectPrice').value = project.price;
             document.getElementById('projectPaid').value = project.paid;
+            document.getElementById('projectPaperSize').value = project.paperSize || '';
+            document.getElementById('projectPaperType').value = project.paperType || '';
+            document.getElementById('projectCopies').value = project.copies || 1;
             document.getElementById('projectImage').value = project.image;
             document.getElementById('projectFile').value = '';
             
@@ -2163,6 +2202,53 @@
                 updateDashboard();
                 updateCharts();
             }
+        }
+
+        function sendToImprenta(id) {
+            const project = projects.find(p => p.id === id);
+            if (!project) return;
+            
+            const messageText = `--- NUEVO TRABAJO DE IMPRESIÓN ---
+Proyecto: ${project.title || 'Sin Título'}
+Cliente: ${project.client || 'Sin Cliente'}
+
+ESPECIFICACIONES:
+- Copias: ${project.copies || 1}
+- Tamaño: ${project.paperSize || 'No especificado'}
+- Papel: ${project.paperType || 'No especificado'}
+- Notas extra: ${project.description || 'Sin notas'}
+
+ENLACE DE DESCARGA ARCHIVO FINAL:
+${project.fileUrl || 'Sin archivo adjuntado en Studio Gestor'}
+-----------------------------------`;
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://linea-2.com/workgroup/tickets/add/';
+            form.target = '_blank';
+            
+            // Intento con los name habituales de osTicket / gestores php
+            const descInput = document.createElement('input');
+            descInput.type = 'hidden';
+            descInput.name = 'message'; // Frecuente
+            descInput.value = messageText;
+            
+            const altDescInput = document.createElement('input');
+            altDescInput.type = 'hidden';
+            altDescInput.name = 'descripcion'; // En español
+            altDescInput.value = messageText;
+            
+            const subjectInput = document.createElement('input');
+            subjectInput.type = 'hidden';
+            subjectInput.name = 'subject';
+            subjectInput.value = `Impresión: ${project.title}`;
+            
+            form.appendChild(descInput);
+            form.appendChild(altDescInput);
+            form.appendChild(subjectInput);
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         }
 
         function updateDashboard() {
@@ -2395,6 +2481,9 @@
             document.getElementById('projectDeliveryDate').value = '';
             document.getElementById('projectPrice').value = '';
             document.getElementById('projectPaid').value = '';
+            document.getElementById('projectPaperSize').value = '';
+            document.getElementById('projectPaperType').value = '';
+            document.getElementById('projectCopies').value = '1';
             document.getElementById('projectImage').value = '';
             document.getElementById('projectFile').value = '';
             document.getElementById('projectFileProgress').style.display = 'none';
