@@ -582,6 +582,137 @@
             margin-bottom: 0.5rem;
         }
 
+        /* MODAL IMPRENTA */
+        #imprentaModal .modal-content {
+            max-width: 680px;
+        }
+        .imprenta-steps {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .imprenta-step {
+            flex: 1;
+            text-align: center;
+            padding: 0.6rem 0.4rem;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            background: var(--bg-tertiary);
+            color: var(--text-tertiary);
+            border: 1.5px solid var(--border);
+            position: relative;
+        }
+        .imprenta-step.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .imprenta-step.done {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        .imprenta-field-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+        }
+        .imprenta-field-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-tertiary);
+            min-width: 110px;
+            font-weight: 600;
+        }
+        .imprenta-field-value {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-primary);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .imprenta-copy-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 12px;
+            border-radius: 6px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+        .imprenta-copy-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .imprenta-copy-btn.copied {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+        .imprenta-dept-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 1.25rem;
+            cursor: pointer;
+        }
+        .imprenta-open-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #1a3a5c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .imprenta-open-btn:hover {
+            background: #24508a;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(26,58,92,0.3);
+        }
+        .imprenta-hint {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 12px;
+            color: #92400e;
+            margin-top: 1rem;
+            line-height: 1.5;
+        }
+        @media (prefers-color-scheme: dark) {
+            .imprenta-hint {
+                background: #2a2000;
+                border-color: #664d00;
+                color: #fbbf24;
+            }
+        }
+
         .task-summary-value {
             font-size: 20px;
             font-weight: 500;
@@ -1343,6 +1474,80 @@
             </div>
         </div>
     </div> <!-- cierre de appContainer -->
+
+    <!-- MODAL ENVÍO A IMPRENTA -->
+    <div id="imprentaModal" class="modal">
+        <div class="modal-content" style="max-width:680px;">
+            <div class="modal-header">
+                <h2>🖨️ Enviar a Linea 2</h2>
+                <button class="close-btn" onclick="closeModal('imprentaModal')">&#x2715;</button>
+            </div>
+
+            <!-- Pasos -->
+            <div class="imprenta-steps">
+                <div class="imprenta-step" id="istep0">⓪ Descargar archivo</div>
+                <div class="imprenta-step done" id="istep1">① Seleccionar dept.</div>
+                <div class="imprenta-step active" id="istep2">② Copiar asunto</div>
+                <div class="imprenta-step" id="istep3">③ Copiar descripción</div>
+                <div class="imprenta-step" id="istep4">④ Abrir Linea 2</div>
+            </div>
+
+            <!-- Descarga archivo (visible solo si el proyecto tiene archivo) -->
+            <div id="imprentaFileRow" class="imprenta-field-row" style="display:none; align-items:center; border: 1.5px solid var(--info); background: #eef6ff;">
+                <span style="font-size:18px;">📎</span>
+                <div style="flex:1;">
+                    <div style="font-size:12px; font-weight:700; color:#1a3a5c; margin-bottom:2px;">Archivo adjunto del proyecto</div>
+                    <div style="font-size:11px; color:#5b9bd5; word-break:break-all;" id="imprentaFileName"></div>
+                </div>
+                <a id="imprentaDownloadLink" href="#" target="_blank" download>
+                    <button class="imprenta-copy-btn" id="downloadFileBtn" onclick="imprentaMarkDownload()" style="background:#1a3a5c; color:white; border-color:#1a3a5c;">
+                        ⬇ Descargar
+                    </button>
+                </a>
+            </div>
+            <div id="imprentaNoFileRow" style="display:none; font-size:12px; color:var(--text-tertiary); margin-bottom:1rem; padding: 0.6rem 1rem; background:var(--bg-secondary); border-radius:6px; border:1px dashed var(--border);">
+                ℹ️ Este proyecto no tiene archivo adjunto. Puedes adjuntarlo manualmente en Linea 2.
+            </div>
+
+            <!-- Departamento -->
+            <label style="font-size:13px; font-weight:600; margin-bottom:0.4rem; display:block;">Departamento destino</label>
+            <select id="imprentaDept" class="imprenta-dept-select">
+                <option value="1">PRESUPUESTOS</option>
+                <option value="4" selected>IMPRESIÓN Digital</option>
+                <option value="3">CARTELERÍA</option>
+                <option value="2">PLOTEADO Planos</option>
+            </select>
+
+            <!-- Asunto -->
+            <div class="imprenta-field-row">
+                <span class="imprenta-field-label">Nombre/Asunto</span>
+                <span class="imprenta-field-value" id="imprentaSubjectPreview"></span>
+                <button class="imprenta-copy-btn" id="copySubjectBtn" onclick="imprentaCopy('imprentaSubjectPreview','copySubjectBtn','istep2','istep3')">📋 Copiar</button>
+            </div>
+
+            <!-- Descripción -->
+            <div class="imprenta-field-row" style="align-items:flex-start;">
+                <span class="imprenta-field-label" style="padding-top:0.2rem;">Descripción</span>
+                <span class="imprenta-field-value" id="imprentaDescPreview" style="font-size:12px; line-height:1.6;"></span>
+                <button class="imprenta-copy-btn" id="copyDescBtn" onclick="imprentaCopy('imprentaDescPreview','copyDescBtn','istep3','istep4')">📋 Copiar</button>
+            </div>
+
+            <!-- Botón abrir -->
+            <button class="imprenta-open-btn" id="imprentaOpenBtn" onclick="imprentaOpenLinea2()">
+                <span>Abrir Linea 2 — Workgroup</span> <span style="font-size:18px;">↗</span>
+            </button>
+
+            <div class="imprenta-hint">
+                💡 <strong>Cómo funciona:</strong>
+                <ol style="margin-top:0.4rem; padding-left:1.2rem; line-height:2;">
+                    <li>Si hay archivo adjunto, descárgalo primero con el botón azul.</li>
+                    <li>Copia el <strong>asunto</strong> → pégalo en "Nombre Completo/Teléfono" en Linea 2.</li>
+                    <li>Copia la <strong>descripción</strong> → pégala en el campo "Descripción".</li>
+                    <li>Abre Linea 2, selecciona el departamento, adjunta el archivo descargado y haz clic en <em>Crear Nuevo Trabajo</em>.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
 
     <div id="clientModal" class="modal">
         <div class="modal-content">
@@ -2204,51 +2409,93 @@
             }
         }
 
+        // Proyecto activo para el modal imprenta
+        let _imprentaProject = null;
+
         function sendToImprenta(id) {
             const project = projects.find(p => p.id === id);
             if (!project) return;
-            
-            const messageText = `--- NUEVO TRABAJO DE IMPRESIÓN ---
-Proyecto: ${project.title || 'Sin Título'}
-Cliente: ${project.client || 'Sin Cliente'}
+            _imprentaProject = project;
 
-ESPECIFICACIONES:
-- Copias: ${project.copies || 1}
-- Tamaño: ${project.paperSize || 'No especificado'}
-- Papel: ${project.paperType || 'No especificado'}
-- Notas extra: ${project.description || 'Sin notas'}
+            const subjectText = `${project.title || 'Sin Título'} - ${project.client || ''}`;
+            const descText =
+`ESPECIFICACIONES DE IMPRESIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Proyecto : ${project.title || '-'}
+Cliente  : ${project.client || '-'}
+Copias   : ${project.copies || 1}
+Tamaño   : ${project.paperSize || 'No especificado'}
+Papel    : ${project.paperType || 'No especificado'}
+Notas    : ${project.description || 'Sin notas'}
 
-ENLACE DE DESCARGA ARCHIVO FINAL:
-${project.fileUrl || 'Sin archivo adjuntado en Studio Gestor'}
------------------------------------`;
+ARCHIVO FINAL:
+${project.fileUrl || 'Sin archivo adjuntado en Studio Gestor'}`;
 
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = 'https://linea-2.com/workgroup/tickets/add/';
-            form.target = '_blank';
-            
-            // Intento con los name habituales de osTicket / gestores php
-            const descInput = document.createElement('input');
-            descInput.type = 'hidden';
-            descInput.name = 'message'; // Frecuente
-            descInput.value = messageText;
-            
-            const altDescInput = document.createElement('input');
-            altDescInput.type = 'hidden';
-            altDescInput.name = 'descripcion'; // En español
-            altDescInput.value = messageText;
-            
-            const subjectInput = document.createElement('input');
-            subjectInput.type = 'hidden';
-            subjectInput.name = 'subject';
-            subjectInput.value = `Impresión: ${project.title}`;
-            
-            form.appendChild(descInput);
-            form.appendChild(altDescInput);
-            form.appendChild(subjectInput);
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
+            document.getElementById('imprentaSubjectPreview').textContent = subjectText;
+            document.getElementById('imprentaDescPreview').textContent = descText;
+
+            // Gestionar fila de archivo
+            const fileRow = document.getElementById('imprentaFileRow');
+            const noFileRow = document.getElementById('imprentaNoFileRow');
+            const step0 = document.getElementById('istep0');
+
+            if (project.fileUrl) {
+                fileRow.style.display = 'flex';
+                noFileRow.style.display = 'none';
+                document.getElementById('imprentaFileName').textContent = project.fileName || 'archivo adjunto';
+                document.getElementById('imprentaDownloadLink').href = project.fileUrl;
+                document.getElementById('imprentaDownloadLink').download = project.fileName || 'archivo';
+                step0.style.display = '';
+                step0.className = 'imprenta-step active';
+            } else {
+                fileRow.style.display = 'none';
+                noFileRow.style.display = 'block';
+                step0.style.display = 'none';
+            }
+
+            // Resetear pasos
+            document.getElementById('istep1').className = 'imprenta-step done';
+            document.getElementById('istep2').className = 'imprenta-step' + (project.fileUrl ? '' : ' active');
+            document.getElementById('istep3').className = 'imprenta-step';
+            document.getElementById('istep4').className = 'imprenta-step';
+            document.getElementById('copySubjectBtn').className = 'imprenta-copy-btn';
+            document.getElementById('copySubjectBtn').textContent = '📋 Copiar';
+            document.getElementById('copyDescBtn').className = 'imprenta-copy-btn';
+            document.getElementById('copyDescBtn').textContent = '📋 Copiar';
+            const dlBtn = document.getElementById('downloadFileBtn');
+            dlBtn.className = 'imprenta-copy-btn';
+            dlBtn.style.cssText = 'background:#1a3a5c; color:white; border-color:#1a3a5c;';
+            dlBtn.textContent = '⬇ Descargar';
+
+            openModal('imprentaModal');
+        }
+
+        function imprentaMarkDownload() {
+            const btn = document.getElementById('downloadFileBtn');
+            btn.textContent = '✅ Descargado';
+            btn.style.cssText = 'background:var(--success); color:white; border-color:var(--success);';
+            document.getElementById('istep0').className = 'imprenta-step done';
+            document.getElementById('istep2').className = 'imprenta-step active';
+        }
+
+        function imprentaCopy(previewId, btnId, doneStepId, nextStepId) {
+            const text = document.getElementById(previewId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById(btnId);
+                btn.textContent = '✅ Copiado';
+                btn.className = 'imprenta-copy-btn copied';
+                document.getElementById(doneStepId).className = 'imprenta-step done';
+                if (nextStepId) document.getElementById(nextStepId).className = 'imprenta-step active';
+            }).catch(() => {
+                alert('No se pudo copiar. Selecciona el texto y cópialo manualmente.');
+            });
+        }
+
+        function imprentaOpenLinea2() {
+            const deptId = document.getElementById('imprentaDept').value;
+            const url = `https://linea-2.com/workgroup/tickets/add/?department_id=${deptId}`;
+            window.open(url, '_blank');
+            document.getElementById('istep4').className = 'imprenta-step done';
         }
 
         function updateDashboard() {
