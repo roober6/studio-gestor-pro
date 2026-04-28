@@ -1117,10 +1117,13 @@
             border-radius: 8px;
             padding: 0.9rem;
             margin-bottom: 0.6rem;
-            cursor: pointer;
-            transition: box-shadow 0.2s;
+            cursor: grab;
+            transition: box-shadow 0.2s, opacity 0.2s;
+            user-select: none;
         }
         .kanban-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .kanban-card.dragging { opacity: 0.4; cursor: grabbing; }
+        .kanban-column.drag-over { background: var(--accent-light); outline: 2px dashed var(--accent); }
         .kanban-card-title { font-size: 13px; font-weight: 500; margin-bottom: 0.25rem; }
         .kanban-card-client { font-size: 11px; color: var(--text-tertiary); margin-bottom: 0.5rem; }
         .kanban-card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-secondary); }
@@ -2934,19 +2937,30 @@ ${project.fileUrl || 'Sin archivo adjuntado en Studio Gestor'}`;
         }
 
         // ===== KANBAN =====
+        let _dragId = null;
+
         function renderKanbanView() {
             const board = document.getElementById('projectsKanban');
             const allStatuses = [...new Set(projects.map(p => p.status || 'sin-estado'))];
             board.innerHTML = allStatuses.map(status => {
                 const cols = filteredProjects.filter(p => (p.status || 'sin-estado') === status);
                 return `
-                <div class="kanban-column">
+                <div class="kanban-column"
+                    data-status="${status}"
+                    ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                    ondragleave="this.classList.remove('drag-over')"
+                    ondrop="kanbanDrop(event, '${status}')">
                     <div class="kanban-column-header">
                         <span>${status}</span>
                         <span class="k-count">${cols.length}</span>
                     </div>
                     ${cols.map(p => `
-                        <div class="kanban-card" onclick="openSidePanel(${p.id})">
+                        <div class="kanban-card"
+                            draggable="true"
+                            data-id="${p.id}"
+                            ondragstart="kanbanDragStart(event, ${p.id})"
+                            ondragend="this.classList.remove('dragging')"
+                            onclick="if(!_dragging) openSidePanel(${p.id})">
                             <div class="kanban-card-title">${p.title}${getDeliveryBadge(p)}${getTasksBadge(p.title)}</div>
                             <div class="kanban-card-client">${p.client || '-'}</div>
                             <div class="kanban-card-meta">
@@ -2957,6 +2971,30 @@ ${project.fileUrl || 'Sin archivo adjuntado en Studio Gestor'}`;
                     `).join('')}
                 </div>`;
             }).join('');
+        }
+
+        let _dragging = false;
+
+        function kanbanDragStart(event, id) {
+            _dragId = id;
+            _dragging = true;
+            event.target.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+        }
+
+        function kanbanDrop(event, newStatus) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            if (_dragId === null) return;
+            const p = projects.find(x => x.id === _dragId);
+            if (p && p.status !== newStatus) {
+                p.status = newStatus;
+                saveProjects();
+                renderKanbanView();
+                updateDashboard();
+            }
+            _dragId = null;
+            setTimeout(() => { _dragging = false; }, 50);
         }
 
         // ===== PANEL LATERAL =====
