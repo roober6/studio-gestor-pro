@@ -1853,8 +1853,15 @@
             }
         }
 
-        function deleteTask(id) {
+        async function deleteTask(id) {
             tasks = tasks.filter(t => t.id !== id);
+            if (currentUserId) {
+                try {
+                    await db.collection('users').doc(currentUserId).collection('tasks').doc(String(id)).delete();
+                } catch (error) {
+                    console.error("⚠️ Error eliminando tarea de Firestore:", error);
+                }
+            }
             saveTasks();
             renderTasks();
             updateTaskSummary();
